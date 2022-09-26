@@ -49,5 +49,5 @@
   ansible.builtin.apt:
     deb: "/root/software/flexera/{{ package_name }}"
     state: present
-  when: ansible_facts['os_family'] == 'RedHat'
+  when: ansible_facts['os_family'] == 'Debian'
     #- '"managesoft" not in ansible_facts.packages'
