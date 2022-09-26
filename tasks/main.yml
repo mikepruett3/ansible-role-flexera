@@ -1,2 +1,44 @@
 ---
 # tasks file for ansible-role-flexera
+
+#- name: "Include OS-specific variables"
+#  include_vars: "{{ ansible_os_family }}.yaml"
+
+#- name: "Gather the package facts"
+#  ansible.builtin.package_facts:
+#    manager: auto
+#  when: ansible_facts.packages is not defined
+
+- name: "Create software directory under root homedir, if it does not exist"
+  ansible.builtin.file:
+    path: "/root/software/flexera/"
+    state: directory
+
+- name: "Check if installer package already exist"
+  ansible.builtin.stat:
+    path: "/root/software/flexera/{{ package_name }}"
+  register: package
+
+- name: "Download installer package from local repository"
+  ansible.builtin.get_url:
+    url: "{{ software_url }}/{{ package_name }}"
+    dest: "/root/software/flexera/"
+    validate_certs: no
+    mode: 0774
+  when: package.stat.exists != True
+
+- name: "Install package (RHEL)"
+  ansible.builtin.yum:
+    name: "/root/software/flexera/{{ package_name }}"
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    #- '"splunkforwarder" not in ansible_facts.packages'
+
+- name: "Install package (Debian)"
+  ansible.builtin.apt:
+    deb: "/root/software/flexera/{{ package_name }}"
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    #- '"splunkforwarder" not in ansible_facts.packages'

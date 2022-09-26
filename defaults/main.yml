@@ -1,2 +1,5 @@
 ---
 # defaults file for ansible-role-flexera
+
+software_url: "http://www.example.org"
+package_name: "managesoft-17.3.0-1.x86_64.rpm"
