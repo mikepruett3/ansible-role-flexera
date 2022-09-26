@@ -38,11 +38,22 @@
     - "{{ response_file }}"
     - "{{ cert_file }}"
 
-- name: "Install package (RHEL)"
+- name: "Install package (RHEL - yum)"
   ansible.builtin.yum:
     name: "/root/software/flexera/{{ package_name }}"
     state: present
-  when: ansible_facts['os_family'] == 'RedHat'
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] <= '7'
+    #- '"managesoft" not in ansible_facts.packages'
+
+- name: "Install package (RHEL - dnf)"
+  ansible.builtin.dnf:
+    name: "/root/software/flexera/{{ package_name }}"
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] >= '8'
     #- '"managesoft" not in ansible_facts.packages'
 
 - name: "Install package (Debian)"
