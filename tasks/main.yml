@@ -27,18 +27,27 @@
     mode: 0774
   when: package.stat.exists != True
 
+- name: "Move cert & response files to /var/tmp"
+  ansible.builtin.get_url:
+    url: "{{ software_url }}/{{ item }}"
+    dest: "/var/tmp/"
+    validate_certs: no
+    mode: 0774
+  when: package.stat.exists != True
+  with_items:
+    - "{{ response_file }}"
+    - "{{ cert_file }}"
+
 - name: "Install package (RHEL)"
   ansible.builtin.yum:
     name: "/root/software/flexera/{{ package_name }}"
     state: present
-  when:
-    - ansible_facts['os_family'] == 'RedHat'
-    #- '"splunkforwarder" not in ansible_facts.packages'
+  when: ansible_facts['os_family'] == 'RedHat'
+    #- '"managesoft" not in ansible_facts.packages'
 
 - name: "Install package (Debian)"
   ansible.builtin.apt:
     deb: "/root/software/flexera/{{ package_name }}"
     state: present
-  when:
-    - ansible_facts['os_family'] == 'RedHat'
-    #- '"splunkforwarder" not in ansible_facts.packages'
+  when: ansible_facts['os_family'] == 'RedHat'
+    #- '"managesoft" not in ansible_facts.packages'
