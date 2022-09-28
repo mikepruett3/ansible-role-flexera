@@ -4,10 +4,10 @@
 #- name: "Include OS-specific variables"
 #  include_vars: "{{ ansible_os_family }}.yaml"
 
-#- name: "Gather the package facts"
-#  ansible.builtin.package_facts:
-#    manager: auto
-#  when: ansible_facts.packages is not defined
+- name: "Gather the package facts"
+  ansible.builtin.package_facts:
+    manager: auto
+  when: ansible_facts.packages is not defined
 
 - name: "Create software directory under root homedir, if it does not exist"
   ansible.builtin.file:
@@ -45,7 +45,7 @@
   when:
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['distribution_major_version'] <= '7'
-    #- '"managesoft" not in ansible_facts.packages'
+    - '"managesoft" not in ansible_facts.packages'
 
 - name: "Install package (RHEL - dnf)"
   ansible.builtin.dnf:
@@ -55,11 +55,12 @@
   when:
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['distribution_major_version'] >= '8'
-    #- '"managesoft" not in ansible_facts.packages'
+    - '"managesoft" not in ansible_facts.packages'
 
 - name: "Install package (Debian)"
   ansible.builtin.apt:
     deb: "/root/software/flexera/{{ package_name }}"
     state: present
-  when: ansible_facts['os_family'] == 'Debian'
-    #- '"managesoft" not in ansible_facts.packages'
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - '"managesoft" not in ansible_facts.packages'
