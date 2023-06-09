@@ -2,7 +2,7 @@
 # Lookup tasks file for ansible-role-splunk
 
 - name: "Collect hash of the Managesoft Certificate"
-  community.crypto.x509_certificate:
+  community.crypto.x509_certificate_info:
     path: /var/opt/managesoft/etc/ssl/cert.pem
   register: result
 
