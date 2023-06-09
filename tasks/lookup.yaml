@@ -15,6 +15,13 @@
     - result.stat.isdir
     - result.failed is false
 
+- name: "Set Facts for Install variable"
+  ansible.builtin.set_fact:
+    install: true
+  when:
+    - managesoft_home is not defined
+    - result.failed is true
+
 - name: "Check for Managesoft config directory"
   ansible.builtin.stat:
     path: /var/opt/managesoft
@@ -39,19 +46,6 @@
     certificate: "{{ result.stdout | split('=') | last }}"
   when:
     - result.failed is false
-
-#- name: "Check for splunk executable"
-#  ansible.builtin.stat:
-#    path: "{{ splunk_home }}/bin/splunk"
-#  register: result
-#  ignore_errors: true
-
-#- name: "Set Facts for Install variable"
-#  ansible.builtin.set_fact:
-#    install: true
-#  when:
-#    - splunk_home is not defined
-#    - result.failed is true
 
 #- name: "Get the version of installed Universal Forwarder Client"
 #  ansible.builtin.shell:
