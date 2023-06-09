@@ -3,7 +3,7 @@
 
 - name: "Collect hash of the Managesoft Certificate"
   community.crypto.x509_certificate:
-    path: /etc/ssl/crt/ansible.com.crt
+    path: /var/opt/managesoft/etc/ssl/cert.pem
   register: result
 
 - name: Dump information
