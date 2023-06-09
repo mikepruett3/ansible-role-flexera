@@ -1,0 +1,104 @@
+---
+# Install tasks file for ansible-role-flexera
+
+- name: "Test if install boolean variable is set correctly"
+  ansible.builtin.assert:
+    that:
+      - install is defined
+      - install is boolean
+    quiet: yes
+
+- name: "Create software directory under root homedir, if it does not exist"
+  ansible.builtin.file:
+    path: "/root/software/flexera/"
+    state: directory
+
+- name: "Check if installer package already exist"
+  ansible.builtin.stat:
+    path: "/root/software/flexera/{{ package_name }}"
+  register: package
+
+- name: "Download installer package from local repository"
+  ansible.builtin.get_url:
+    url: "{{ software_url }}/{{ package_name }}"
+    dest: "/root/software/flexera/"
+    validate_certs: no
+    mode: '0770'
+  when:
+    - not package.stat.exists | bool
+
+- name: "Download Flexera Certificate & Response files to /var/tmp"
+  ansible.builtin.get_url:
+    url: "{{ software_url }}/{{ item }}"
+    dest: "/var/tmp/"
+    validate_certs: no
+    mode: '0774'
+  with_items:
+    - "{{ response_file }}"
+    - "{{ cert_file }}"
+  when:
+    - not package.stat.exists | bool
+
+- name: "Download Flexera Certificate file to /etc/pki/ca-trust/source/anchors/"
+  ansible.builtin.get_url:
+    url: "{{ software_url }}/{{ cert_file }}"
+    dest: "/etc/pki/ca-trust/source/anchors/flexera_faps_net.crt"
+    validate_certs: no
+    mode: '0774'
+  when:
+    - not package.stat.exists | bool
+
+- name: "Update local Certificate Authority Trust with Flexera Certificate file"
+  ansible.builtin.shell: update-ca-trust
+  when:
+    - not package.stat.exists | bool
+
+- name: "Install package (RHEL - yum)"
+  ansible.builtin.yum:
+    name: "/root/software/flexera/{{ package_name }}"
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] <= '7'
+    - '"managesoft" not in ansible_facts.packages'
+
+- name: "Install package (RHEL - dnf)"
+  ansible.builtin.dnf:
+    name: "/root/software/flexera/{{ package_name }}"
+    state: present
+    disable_gpg_check: yes
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] >= '8'
+    - '"managesoft" not in ansible_facts.packages'
+
+- name: "Install package (Debian)"
+  ansible.builtin.apt:
+    deb: "/root/software/flexera/{{ package_name }}"
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - '"managesoft" not in ansible_facts.packages'
+
+- name: "Stop ndtask and mgsusageag services"
+  ansible.builtin.systemd:
+    state: stopped
+    name: "{{ item }}"
+  with_items:
+    - ndtask.service
+    - mgsusageag.service
+
+- name: "Disable CheckServerCertificate setting in /var/opt/managesoft/etc/config.ini"
+  ansible.builtin.lineinfile:
+    path: /var/opt/managesoft/etc/config.ini
+    regexp: '(?i)^(CheckServerCertificate.*)'
+    line: "CheckServerCertificate=false"
+
+- name: "Start ndtask and mgsusageag services"
+  ansible.builtin.systemd:
+    state: started
+    name: "{{ item }}"
+  with_items:
+    - ndtask.service
+    - mgsusageag.service
+
