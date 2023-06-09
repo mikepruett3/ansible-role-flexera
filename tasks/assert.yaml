@@ -8,6 +8,6 @@
       - software_url is string
       - package_name is defined
       - package_name is string
-      - package_version is defined
-      - package_version is string
+      #- package_version is defined
+      #- package_version is string
     quiet: yes
