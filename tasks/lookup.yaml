@@ -1,26 +1,30 @@
 ---
 # Lookup tasks file for ansible-role-splunk
 
-- name: "Collect hash of the Managesoft Certificate"
+- name: "Check for Managesoft install directory"
+  ansible.builtin.stat:
+    path: /opt/managesoft
+  register: result
+  ignore_errors: true
+
+- name: "Set Facts for Managesoft install directory"
+  debug:
+    var: result
+  #ansible.builtin.set_fact:
+  #  managesoft_home: "{{ result.stdout | split('=') | last }}"
+  #when:
+  #  - result.failed is false
+
+- name: "Collect fingerprint of the Managesoft Certificate"
   ansible.builtin.shell:
     cmd: openssl x509 -noout -fingerprint -sha256 -inform pem -in /var/opt/managesoft/etc/ssl/cert.pem
   register: result
 
-- name: Dump information
-  ansible.builtin.debug:
-    var: result
-
-#- name: "Check for SPLUNK_HOME Environment Variable"
-#  ansible.builtin.shell:
-#    cmd: . /etc/profile && (env | grep -iP "SPLUNK_HOME")
-#  register: result
-#  ignore_errors: true
-
-#- name: "Set Facts for SPLUNK_HOME Environment Variable"
-#  ansible.builtin.set_fact:
-#    splunk_home: "{{ result.stdout | split('=') | last }}"
-#  when:
-#    - result.failed is false
+- name: "Set Facts for Managesoft Certificate fingerprint"
+  ansible.builtin.set_fact:
+    certificate: "{{ result.stdout | split('=') | last }}"
+  when:
+    - result.failed is false
 
 #- name: "Check for splunk executable"
 #  ansible.builtin.stat:
