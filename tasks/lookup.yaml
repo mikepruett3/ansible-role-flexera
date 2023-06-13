@@ -85,9 +85,14 @@
     - result.stat.exists
     - result.failed is false
 
+- name: "Read from Managesoft Configuration INI File"
+  ansible.builtin.slurp:
+    path: "{{ config_file }}"
+  register: slurp
+
 - name: "Get the version of installed Flexera Inventory Agent"
   debug:
-    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion section=ManageSoft file=config_file) }}"
+    msg: "{{ mounts['content'] | b64decode }}"
   #when:
   #  - result.stat.exists
   #  - result.failed is false
