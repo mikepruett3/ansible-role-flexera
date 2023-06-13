@@ -1,0 +1,24 @@
+---
+# Configuration tasks file for ansible-role-flexera
+
+- name: "Stop ndtask and mgsusageag services"
+  ansible.builtin.systemd:
+    state: stopped
+    name: "{{ item }}"
+  with_items:
+    - ndtask.service
+    - mgsusageag.service
+
+- name: "Disable CheckServerCertificate setting in /var/opt/managesoft/etc/config.ini"
+  ansible.builtin.lineinfile:
+    path: /var/opt/managesoft/etc/config.ini
+    regexp: '(?i)^(CheckServerCertificate.*)'
+    line: "CheckServerCertificate=false"
+
+- name: "Start ndtask and mgsusageag services"
+  ansible.builtin.systemd:
+    state: started
+    name: "{{ item }}"
+  with_items:
+    - ndtask.service
+    - mgsusageag.service

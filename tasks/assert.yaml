@@ -8,6 +8,26 @@
       - software_url is string
       - package_name is defined
       - package_name is string
-      #- package_version is defined
-      #- package_version is string
+      - package_version is defined
+      - package_version is string
+    quiet: yes
+
+- name: "Test if beacon settings are set correctly"
+  ansible.builtin.assert:
+    that:
+      - beacon is defined
+      - beacon is boolean
+      - beacon_host is defined
+      - beacon_host is string
+    quiet: yes
+  when:
+    - beacon is defined
+
+- name: "Test if Certificate and Response File Information is set correctly"
+  ansible.builtin.assert:
+    that:
+      - cert_file is defined
+      - cert_file is string
+      - response_file is defined
+      - response_file is string
     quiet: yes

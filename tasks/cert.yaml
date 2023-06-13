@@ -1,0 +1,35 @@
+---
+# Certificate tasks file for ansible-role-flexera
+
+- name: "Test if install boolean variable is set correctly"
+  ansible.builtin.assert:
+    that:
+      - cert_replace is defined
+      - cert_replace is boolean
+    quiet: yes
+
+- name: "Stop Managesoft services"
+  ansible.builtin.systemd:
+    state: stopped
+    name: "{{ item }}"
+  with_items:
+    - ndtask.service
+    - mgsusageag.service
+
+- name: "Replace Flexera Certificate with latest from /tmp"
+  ansible.builtin.copy:
+    src: "/tmp/{{ cert_file }}"
+    dest: "{{ managesoft_config_dir }}/etc/ssl/cert.pem"
+    owner: root
+    group: root
+    mode: '0754'
+    remote_src: true
+    backup: true
+
+- name: "Start Managesoft services"
+  ansible.builtin.systemd:
+    state: started
+    name: "{{ item }}"
+  with_items:
+    - ndtask.service
+    - mgsusageag.service

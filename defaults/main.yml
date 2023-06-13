@@ -1,6 +1,9 @@
 ---
 # defaults file for ansible-role-flexera
 
+beacon: false
+beacon_host: "http://beacon.example.org"
+
 software_url:   "http://www.example.org"
 package_name:   "managesoft-17.3.0-1.x86_64.rpm"
 package_version: "17.3.0"

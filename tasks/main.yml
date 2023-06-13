@@ -1,102 +1,44 @@
 ---
 # tasks file for ansible-role-flexera
 
+- name: "Test Access to Beacon Server"
+  ansible.builtin.uri:
+    url: "{{ beacon_host }}"
+    method: GET
+    validate_certs: no
+    status_code: [200, 400]
+  when: beacon != false
+
 #- name: "Include OS-specific variables"
 #  ansible.builtin.include_vars:
 #    file: "{{ ansible_os_family }}.yaml"
 
-- name: "Gather the package facts"
-  ansible.builtin.package_facts:
-    manager: auto
-  when: ansible_facts.packages is not defined
+#- name: "Gather the package facts"
+#  ansible.builtin.package_facts:
+#    manager: auto
+#  when:
+#    - ansible_facts['packages'] is not defined
 
-- name: "Create software directory under root homedir, if it does not exist"
-  ansible.builtin.file:
-    path: "/root/software/flexera/"
-    state: directory
+- name: "Include tasks from assert playbook"
+  ansible.builtin.include_tasks: assert.yaml
 
-- name: "Check if installer package already exist"
-  ansible.builtin.stat:
-    path: "/root/software/flexera/{{ package_name }}"
-  register: package
+- name: "Include tasks from lookup playbook"
+  ansible.builtin.include_tasks: lookup.yaml
 
-- name: "Download installer package from local repository"
-  ansible.builtin.get_url:
-    url: "{{ software_url }}/{{ package_name }}"
-    dest: "/root/software/flexera/"
-    validate_certs: no
-    mode: 0774
-  when: package.stat.exists != True
-
-- name: "Download Flexera Certificate & Response files to /var/tmp"
-  ansible.builtin.get_url:
-    url: "{{ software_url }}/{{ item }}"
-    dest: "/var/tmp/"
-    validate_certs: no
-    mode: 0774
-  when: package.stat.exists != True
-  with_items:
-    - "{{ response_file }}"
-    - "{{ cert_file }}"
-
-- name: "Download Flexera Certificate file to /etc/pki/ca-trust/source/anchors/"
-  ansible.builtin.get_url:
-    url: "{{ software_url }}/{{ cert_file }}"
-    dest: "/etc/pki/ca-trust/source/anchors/flexera_faps_net.crt"
-    validate_certs: no
-    mode: 0774
-  when: package.stat.exists != True
-
-- name: "Update local Certificate Authority Trust with Flexera Certificate file"
-  ansible.builtin.shell: update-ca-trust
-  when: package.stat.exists != True
-
-- name: "Install package (RHEL - yum)"
-  ansible.builtin.yum:
-    name: "/root/software/flexera/{{ package_name }}"
-    state: present
+- name: "Include tasks from install playbook"
+  ansible.builtin.include_tasks: install.yaml
   when:
-    - ansible_facts['os_family'] == 'RedHat'
-    - ansible_facts['distribution_major_version'] <= '7'
-    - '"managesoft" not in ansible_facts.packages'
+    - install is defined
+    - install | bool
 
-- name: "Install package (RHEL - dnf)"
-  ansible.builtin.dnf:
-    name: "/root/software/flexera/{{ package_name }}"
-    state: present
-    disable_gpg_check: yes
+#- name: "Include tasks from upgrade playbook"
+#  ansible.builtin.include_tasks: upgrade.yaml
+#  when:
+#    - upgrade is defined
+#    - upgrade | bool
+
+- name: "Include tasks from cert playbook"
+  ansible.builtin.include_tasks: cert.yaml
   when:
-    - ansible_facts['os_family'] == 'RedHat'
-    - ansible_facts['distribution_major_version'] >= '8'
-    - '"managesoft" not in ansible_facts.packages'
-
-- name: "Install package (Debian)"
-  ansible.builtin.apt:
-    deb: "/root/software/flexera/{{ package_name }}"
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'Debian'
-    - '"managesoft" not in ansible_facts.packages'
-
-- name: "Stop ndtask and mgsusageag services"
-  ansible.builtin.systemd:
-    state: stopped
-    name: "{{ item }}"
-  with_items:
-    - ndtask.service
-    - mgsusageag.service
-
-- name: "Disable CheckServerCertificate setting in /var/opt/managesoft/etc/config.ini"
-  ansible.builtin.lineinfile:
-    path: /var/opt/managesoft/etc/config.ini
-    regexp: '(?i)^(CheckServerCertificate.*)'
-    line: "CheckServerCertificate=false"
-
-- name: "Start ndtask and mgsusageag services"
-  ansible.builtin.systemd:
-    state: started
-    name: "{{ item }}"
-  with_items:
-    - ndtask.service
-    - mgsusageag.service
-
+    - cert_replace is defined
+    - cert_replace | bool
