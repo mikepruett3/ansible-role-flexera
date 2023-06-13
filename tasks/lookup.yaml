@@ -87,7 +87,7 @@
 
 - name: "Read from Managesoft Configuration INI File"
   ansible.builtin.shell:
-    cmd: "cat {{ managesoft_config_dir }}/etc/config.ini | grep -iP 'ETCPVersion='"
+    cmd: "cat {{ config_file }} | grep -iP 'ETCPVersion='"
   register: result
 
 - name: "Get the version of installed Flexera Inventory Agent"
@@ -101,7 +101,7 @@
   ansible.builtin.set_fact:
     installed_version: "{{ result.stdout | split('=') | last }}"
   when:
-    - result.stat.exists
+    - result is defined
     - result.failed is false
 
   #ansible.builtin.shell:
