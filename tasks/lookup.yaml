@@ -78,12 +78,12 @@
     path: "{{ managesoft_config_dir }}/etc/config.ini"
   register: result
 
-#- name: "Set Facts for Managesoft Configuration INI File"
-#  ansible.builtin.set_fact:
-#    config_file: "{{ managesoft_config_dir }}/etc/config.ini"
-#  when:
-#    - result.stat.exists
-#    - result.failed is false
+- name: "Set Facts for Managesoft Configuration INI File"
+  ansible.builtin.set_fact:
+    config_file: "{{ managesoft_config_dir }}/etc/config.ini"
+  when:
+    - result.stat.exists
+    - result.failed is false
 
 - name: "Read from Managesoft Configuration INI File"
   ansible.builtin.shell:
@@ -93,6 +93,13 @@
 - name: "Get the version of installed Flexera Inventory Agent"
   debug:
     var: result.stdout
+  when:
+    - result is defined
+    - result.failed is false
+
+- name: "Set Facts for Flexera Inventory Agent Installed Version"
+  ansible.builtin.set_fact:
+    installed_version: "{{ result.stdout | split('=') | last }}"
   when:
     - result.stat.exists
     - result.failed is false
