@@ -3,5 +3,7 @@
 
 software_url:   "http://www.example.org"
 package_name:   "managesoft-17.3.0-1.x86_64.rpm"
+package_version: "17.3.0"
+
 cert_file:      "mgsft_rollout_cert"
 response_file:  "mgsft_rollout_response"

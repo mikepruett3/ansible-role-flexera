@@ -104,23 +104,10 @@
     - result is defined
     - result.failed is false
 
-  #ansible.builtin.shell:
-  #  cmd: ./splunk version | tail -n 1 | awk '{ print $4 }'
-  #  chdir: "{{ splunk_home }}/bin"
-  #register: result
-  #when:
-  #  - splunk_home is defined
-
-#- name: "Set Facts for installed Universal Forwarder Client version"
-#  ansible.builtin.set_fact:
-#    splunk_version: "{{ result.stdout }}"
-#  when:
-#    - result.failed is false
-
-#- name: "Set Facts for Upgrade variable"
-#  ansible.builtin.set_fact:
-#    upgrade: true
-#  when:
-#    - splunk_version is defined
-#    - splunk_version != package_version
-#    #- splunk_version != '7'
+- name: "Set Facts for Upgrade variable"
+  ansible.builtin.set_fact:
+    upgrade: true
+  when:
+    - installed_version is defined
+    - installed_version != package_version
+    #- splunk_version != '7'
