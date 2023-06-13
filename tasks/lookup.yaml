@@ -78,9 +78,16 @@
     path: "{{ managesoft_config_dir }}/etc/config.ini"
   register: result
 
+- name: "Set Facts for Managesoft Configuration INI File"
+  ansible.builtin.set_fact:
+    config_file: "{{ managesoft_config_dir }}/etc/config.ini"
+  when:
+    - result.stat.exists
+    - result.failed is false
+
 - name: "Get the version of installed Flexera Inventory Agent"
   debug:
-    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion', section='ManageSoft', file=managesoft_config_dir + '/etc/config.ini') }}"
+    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion', section='ManageSoft', file=config_file ) }}"
   #when:
   #  - result.stat.exists
   #  - result.failed is false
