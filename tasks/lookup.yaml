@@ -80,10 +80,10 @@
 
 - name: "Get the version of installed Flexera Inventory Agent"
   debug:
-    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion', section='ManageSoft', file=' + managesoft_config_dir + '/etc/config.ini') }}"
-  when:
-    - result.stat.exists
-    - result.failed is false
+    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion', section='ManageSoft', file=managesoft_config_dir + '/etc/config.ini') }}"
+  #when:
+  #  - result.stat.exists
+  #  - result.failed is false
 
   #ansible.builtin.shell:
   #  cmd: ./splunk version | tail -n 1 | awk '{ print $4 }'
