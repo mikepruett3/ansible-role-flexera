@@ -87,7 +87,7 @@
 
 - name: "Get the version of installed Flexera Inventory Agent"
   debug:
-    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion section=ManageSoft file={{ config_file }}) }}"
+    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion section=ManageSoft file=config_file) }}"
   #when:
   #  - result.stat.exists
   #  - result.failed is false
