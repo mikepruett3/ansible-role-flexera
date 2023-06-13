@@ -78,24 +78,24 @@
     path: "{{ managesoft_config_dir }}/etc/config.ini"
   register: result
 
-- name: "Set Facts for Managesoft Configuration INI File"
-  ansible.builtin.set_fact:
-    config_file: "{{ managesoft_config_dir }}/etc/config.ini"
-  when:
-    - result.stat.exists
-    - result.failed is false
+#- name: "Set Facts for Managesoft Configuration INI File"
+#  ansible.builtin.set_fact:
+#    config_file: "{{ managesoft_config_dir }}/etc/config.ini"
+#  when:
+#    - result.stat.exists
+#    - result.failed is false
 
 - name: "Read from Managesoft Configuration INI File"
-  ansible.builtin.slurp:
-    path: "{{ config_file }}"
-  register: slurp
+  ansible.builtin.shell:
+    cmd: "cat {{ managesoft_config_dir }}/etc/config.ini | grep -iP 'ETCPVersion='"
+  register: result
 
 - name: "Get the version of installed Flexera Inventory Agent"
   debug:
-    msg: "{{ lookup('ini', 'ETCPVersion', section='ManageSoft', file='/var/opt/managesoft/etc/config.ini') }}"
-  #when:
-  #  - result.stat.exists
-  #  - result.failed is false
+    var: result.stdout
+  when:
+    - result.stat.exists
+    - result.failed is false
 
   #ansible.builtin.shell:
   #  cmd: ./splunk version | tail -n 1 | awk '{ print $4 }'
