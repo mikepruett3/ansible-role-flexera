@@ -89,7 +89,7 @@
   debug:
     #var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion', section='ManageSoft', file=config_file ) }}"
     msg: "{{ item }}"
-    with_item:
+    with_items:
       - 'ETCPVersion section=ManageSoft, file="{{ config_file }}"'
   #when:
   #  - result.stat.exists
