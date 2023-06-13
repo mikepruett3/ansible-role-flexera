@@ -92,7 +92,7 @@
 
 - name: "Get the version of installed Flexera Inventory Agent"
   debug:
-    msg: "{{ slurp['content'] | b64decode | regex_findall('ETCPVersion=') | first }}"
+    msg: "{{ {{ lookup('ansible.builtin.ini', 'ETCPVersion section=ManageSoft file=/var/opt/managesoft/etc/config.ini) }}"
   #when:
   #  - result.stat.exists
   #  - result.failed is false
