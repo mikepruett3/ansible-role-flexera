@@ -72,15 +72,25 @@
     - certificate is defined
     - certificate_latest is defined
     - certificate != certificate_latest
-    #- splunk_version != '7'
 
-#- name: "Get the version of installed Universal Forwarder Client"
-#  ansible.builtin.shell:
-#    cmd: ./splunk version | tail -n 1 | awk '{ print $4 }'
-#    chdir: "{{ splunk_home }}/bin"
-#  register: result
-#  when:
-#    - splunk_home is defined
+- name: "Check for Managesoft Configuration INI File"
+  ansible.builtin.stat:
+    path: "{{ managesoft_config_dir }}/etc/config.ini"
+  register: result
+
+- name: "Get the version of installed Flexera Inventory Agent"
+  debug:
+    var: "{{ lookup('ansible.builtin.ini', 'ETCPVersion', section='ManageSoft', file='{{ managesoft_config_dir }}/etc/config.ini') }}"
+  when:
+    - result.stat.exists
+    - result.failed is false
+
+  #ansible.builtin.shell:
+  #  cmd: ./splunk version | tail -n 1 | awk '{ print $4 }'
+  #  chdir: "{{ splunk_home }}/bin"
+  #register: result
+  #when:
+  #  - splunk_home is defined
 
 #- name: "Set Facts for installed Universal Forwarder Client version"
 #  ansible.builtin.set_fact:
