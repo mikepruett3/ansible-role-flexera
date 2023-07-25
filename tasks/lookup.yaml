@@ -41,7 +41,7 @@
     cmd: openssl x509 -noout -fingerprint -sha256 -inform pem -in '{{ managesoft_config_dir }}/etc/ssl/cert.pem'
   register: result
   when:
-    - install is not defined
+    - managesoft_config_dir is defined
 
 - name: "Set Facts for Managesoft Certificate fingerprint"
   ansible.builtin.set_fact:
@@ -56,14 +56,14 @@
     validate_certs: no
     mode: '0774'
   when:
-    - install is not defined
+    - managesoft_config_dir is defined
 
 - name: "Collect fingerprint of the latest Managesoft Certificate"
   ansible.builtin.shell:
     cmd: openssl x509 -noout -fingerprint -sha256 -inform pem -in '/tmp/{{ cert_file }}'
   register: result
   when:
-    - install is not defined
+    - managesoft_config_dir is defined
 
 - name: "Set Facts for latest Managesoft Certificate fingerprint"
   ansible.builtin.set_fact:
@@ -83,6 +83,8 @@
   ansible.builtin.stat:
     path: "{{ managesoft_config_dir }}/etc/config.ini"
   register: result
+  when:
+    - managesoft_config_dir is defined
 
 - name: "Set Facts for Managesoft Configuration INI File"
   ansible.builtin.set_fact:
@@ -95,13 +97,15 @@
   ansible.builtin.shell:
     cmd: "cat {{ config_file }} | grep -iP 'ETCPVersion='"
   register: result
-
-- name: "Get the version of installed Flexera Inventory Agent"
-  debug:
-    var: result.stdout
   when:
-    - result is defined
-    - result.failed is false
+    - config_file is defined
+
+#- name: "Get the version of installed Flexera Inventory Agent"
+#  debug:
+#    var: result.stdout
+#  when:
+#    - result is defined
+#    - result.failed is false
 
 - name: "Set Facts for Flexera Inventory Agent Installed Version"
   ansible.builtin.set_fact:
