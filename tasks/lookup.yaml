@@ -19,8 +19,8 @@
   ansible.builtin.set_fact:
     install: true
   when:
-    #- managesoft_home is not defined
-    - result.failed is true
+    - managesoft_home is not defined
+    #- result.failed is true
 
 - name: "Check for Managesoft config directory"
   ansible.builtin.stat:
