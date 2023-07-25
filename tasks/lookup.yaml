@@ -26,8 +26,6 @@
     path: /var/opt/managesoft
   register: result
   ignore_errors: true
-  when:
-    - managesoft_home is defined
 
 - name: "Set Facts for Managesoft config directory"
   ansible.builtin.set_fact:
