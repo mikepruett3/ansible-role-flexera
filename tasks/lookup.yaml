@@ -99,6 +99,7 @@
   register: result
   when:
     - config_file is defined
+    - managesoft_config_dir is defined
 
 #- name: "Get the version of installed Flexera Inventory Agent"
 #  debug:
@@ -119,5 +120,5 @@
     upgrade: true
   when:
     - installed_version is defined
-    - installed_version != package_version
+    - package_version > installed_version
     #- splunk_version != '7'
