@@ -9,16 +9,6 @@
     status_code: [200, 400]
   when: beacon != false
 
-#- name: "Include OS-specific variables"
-#  ansible.builtin.include_vars:
-#    file: "{{ ansible_os_family }}.yaml"
-
-#- name: "Gather the package facts"
-#  ansible.builtin.package_facts:
-#    manager: auto
-#  when:
-#    - ansible_facts['packages'] is not defined
-
 - name: "Include tasks from assert playbook"
   ansible.builtin.include_tasks: assert.yaml
 
