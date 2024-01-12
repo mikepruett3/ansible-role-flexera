@@ -101,16 +101,10 @@
     - config_file is defined
     - managesoft_config_dir is defined
 
-#- name: "Get the version of installed Flexera Inventory Agent"
-#  debug:
-#    var: result.stdout
-#  when:
-#    - result is defined
-#    - result.failed is false
-
 - name: "Set Facts for Flexera Inventory Agent Installed Version"
   ansible.builtin.set_fact:
-    installed_version: "{{ result.stdout | split('=') | last }}"
+    installed_version: "{{ result.stdout | split('=') | last | replace ('-','.') }}"
+    package_version: "{{ package_version | replace ('-','.') }}"
   when:
     - result is defined
     - result.failed is false
@@ -120,5 +114,4 @@
     upgrade: true
   when:
     - installed_version is defined
-    - package_version > installed_version
-    #- splunk_version != '7'
+    - package_version is ansible.builtin.version(installed_version, '>')
