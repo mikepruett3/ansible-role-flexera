@@ -9,12 +9,12 @@
     quiet: yes
 
 - name: "Stop Managesoft services"
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     state: stopped
     name: "{{ item }}"
   with_items:
-    - ndtask.service
-    - mgsusageag.service
+    - ndtask
+    - mgsusageag
 
 - name: "Replace Flexera Certificate with latest from /tmp"
   ansible.builtin.copy:
@@ -27,9 +27,9 @@
     backup: true
 
 - name: "Start Managesoft services"
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     state: started
     name: "{{ item }}"
   with_items:
-    - ndtask.service
-    - mgsusageag.service
+    - ndtask
+    - mgsusageag
