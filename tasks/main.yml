@@ -15,12 +15,6 @@
 - name: "Include tasks from lookup playbook"
   ansible.builtin.include_tasks: lookup.yaml
 
-- name: "Include tasks from cert playbook"
-  ansible.builtin.include_tasks: cert.yaml
-  when:
-    - cert_replace is defined
-    - cert_replace | bool
-
 - name: "Include tasks from install playbook"
   ansible.builtin.include_tasks: install.yaml
   when:
@@ -32,3 +26,9 @@
   when:
     - upgrade is defined
     - upgrade | bool
+
+- name: "Include tasks from cert playbook"
+  ansible.builtin.include_tasks: cert.yaml
+  when:
+    - cert_replace is defined
+    - cert_replace | bool
