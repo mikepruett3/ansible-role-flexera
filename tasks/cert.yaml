@@ -9,9 +9,8 @@
     quiet: yes
 
 - name: "Stop Managesoft services"
-  ansible.builtin.service:
-    state: stopped
-    name: "{{ item }}"
+  ansible.builtin.shell:
+    cmd: service '{{ item }}' stop
   with_items:
     - ndtask
     - mgsusageag
@@ -27,9 +26,8 @@
     backup: true
 
 - name: "Start Managesoft services"
-  ansible.builtin.service:
-    state: started
-    name: "{{ item }}"
+  ansible.builtin.shell:
+    cmd: service '{{ item }}' start
   with_items:
     - ndtask
     - mgsusageag
