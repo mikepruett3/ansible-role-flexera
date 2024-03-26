@@ -32,3 +32,4 @@
   when:
     - cert_replace is defined
     - cert_replace | bool
+    - not upgrade | bool
