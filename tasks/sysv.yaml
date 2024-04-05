@@ -65,3 +65,6 @@
   with_items:
     - mgsusageag
     - ndtask
+  when:
+      - chkconfig is not defined
+      - chkconfig is false
