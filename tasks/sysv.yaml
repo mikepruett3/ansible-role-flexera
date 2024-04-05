@@ -1,0 +1,67 @@
+---
+# SysV Configuration tasks file for ansible-role-flexera
+
+- name: "Check if chkconfig is installed"
+  ansible.builtin.shell:
+    cmd: command -v chkconfig
+  register: result
+  #ignore_errors: true
+
+- name: "Set Facts for chkconfig"
+  ansible.builtin.set_fact:
+    chkconfig: true
+  when:
+    - result.failed is false
+
+- name: "Check for existing /etc/init.d directory"
+  ansible.builtin.stat:
+    path: /etc/init.d
+  register: result
+  #ignore_errors: true
+  when:
+    - chkconfig is not defined
+    - chkconfig is false
+
+- name: "Move existing /etc/init.d entries to temp"
+  ansible.builtin.shell:
+    cmd: mv /etc/init.d /tmp/init.d.bk
+  when:
+    - chkconfig is not defined
+    - chkconfig is false
+    - result.stat.exists
+    - result.stat.isdir
+    - result.failed is false
+
+- name: "Install chkconfig"
+  ansible.builtin.dnf:
+    name: "chkconfig"
+    state: present
+    disable_gpg_check: yes
+  when:
+    - chkconfig is not defined
+    - chkconfig is false
+
+- name: "Move existing /etc/init.d entries back from temp"
+  ansible.builtin.shell:
+    cmd: mv /tmp/init.d.bk/* /etc/init.d/
+  when:
+    - chkconfig is not defined
+    - chkconfig is false
+
+- name: "Register Flexera Services"
+  ansible.builtin.shell:
+    cmd: chkconfig --add {{ item }}
+  with_items:
+    - mgsusageag
+    - ndtask
+  when:
+    - chkconfig is not defined
+    - chkconfig is false
+
+- name: "Start ndtask and mgsusageag services"
+  ansible.builtin.service:
+    state: started
+    name: "{{ item }}"
+  with_items:
+    - mgsusageag
+    - ndtask
