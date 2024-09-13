@@ -33,3 +33,9 @@
     - cert_replace is defined
     - cert_replace | bool
     - upgrade is not defined
+
+- name: "Include tasks from sysv playbook"
+  ansible.builtin.include_tasks: sysv.yaml
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - ansible_facts['distribution_major_version'] >= '9'

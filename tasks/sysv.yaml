@@ -5,7 +5,7 @@
   ansible.builtin.shell:
     cmd: command -v chkconfig
   register: result
-  #ignore_errors: true
+  ignore_errors: true
 
 - name: "Set Facts for chkconfig"
   ansible.builtin.set_fact:
@@ -34,7 +34,7 @@
 
 - name: "Install chkconfig"
   ansible.builtin.dnf:
-    name: "chkconfig"
+    name: "initscripts"
     state: present
     disable_gpg_check: yes
   when:
@@ -54,6 +54,7 @@
   with_items:
     - mgsusageag
     - ndtask
+    - fnms-docker-monitor
   when:
     - chkconfig is not defined
     - chkconfig is false
@@ -65,6 +66,7 @@
   with_items:
     - mgsusageag
     - ndtask
+    - fnms-docker-monitor
   when:
       - chkconfig is not defined
       - chkconfig is false
