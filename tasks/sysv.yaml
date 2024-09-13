@@ -97,11 +97,7 @@
 - name: "Start Flexera Docker services"
   ansible.builtin.service:
     state: started
-    name: "{{ item }}"
-  with_items:
-    - mgsusageag
-    - ndtask
-    - fnms-docker-monitor
+    name: "fnms-docker-monitor"
   when:
       - not chkconfig | bool
       - docker | bool
