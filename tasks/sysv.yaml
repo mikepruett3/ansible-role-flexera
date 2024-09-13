@@ -91,7 +91,6 @@
   ansible.builtin.shell:
     cmd: chkconfig --add fnms-docker-monitor
   when:
-    - not chkconfig | bool
     - docker | bool
 
 - name: "Start Flexera Docker services"
@@ -99,5 +98,4 @@
     state: started
     name: "fnms-docker-monitor"
   when:
-      - not chkconfig | bool
       - docker | bool
