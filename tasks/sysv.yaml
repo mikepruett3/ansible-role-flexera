@@ -19,6 +19,24 @@
   when:
     - result.rc == 0
 
+- name: "Check if docker is installed"
+  ansible.builtin.shell:
+    cmd: command -v docker
+  register: result
+  ignore_errors: true
+
+- name: "Set Facts for docker (false)"
+  ansible.builtin.set_fact:
+    docker: false
+  when:
+    - result.rc != 0
+
+- name: "Set Facts for docker (true)"
+  ansible.builtin.set_fact:
+    docker: true
+  when:
+    - result.rc == 0
+
 - name: "Check for existing /etc/init.d directory"
   ansible.builtin.stat:
     path: /etc/init.d
@@ -50,17 +68,33 @@
   when:
     - not chkconfig | bool
 
-- name: "Register Flexera Services"
+- name: "Register Flexera services"
   ansible.builtin.shell:
     cmd: chkconfig --add {{ item }}
   with_items:
     - mgsusageag
     - ndtask
-    - fnms-docker-monitor
   when:
     - not chkconfig | bool
 
-- name: "Start ndtask and mgsusageag services"
+- name: "Start Flexera services"
+  ansible.builtin.service:
+    state: started
+    name: "{{ item }}"
+  with_items:
+    - mgsusageag
+    - ndtask
+  when:
+      - not chkconfig | bool
+
+- name: "Register Flexera Docker services"
+  ansible.builtin.shell:
+    cmd: chkconfig --add fnms-docker-monitor
+  when:
+    - not chkconfig | bool
+    - docker | bool
+
+- name: "Start Flexera Docker services"
   ansible.builtin.service:
     state: started
     name: "{{ item }}"
@@ -70,3 +104,4 @@
     - fnms-docker-monitor
   when:
       - not chkconfig | bool
+      - docker | bool
