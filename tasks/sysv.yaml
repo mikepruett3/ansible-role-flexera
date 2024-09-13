@@ -7,11 +7,17 @@
   register: result
   ignore_errors: true
 
-- name: "Set Facts for chkconfig"
+- name: "Set Facts for chkconfig (false)"
+  ansible.builtin.set_fact:
+    chkconfig: false
+  when:
+    - result.rc != 0
+
+- name: "Set Facts for chkconfig (true)"
   ansible.builtin.set_fact:
     chkconfig: true
   when:
-    - result.rc != 0
+    - result.rc == 0
 
 - name: "Check for existing /etc/init.d directory"
   ansible.builtin.stat:
@@ -19,13 +25,13 @@
   register: result
   #ignore_errors: true
   when:
-    - chkconfig is not defined
+    - not chkconfig | bool
 
 - name: "Move existing /etc/init.d entries to temp"
   ansible.builtin.shell:
     cmd: mv /etc/init.d /tmp/init.d.bk
   when:
-    - chkconfig is not defined
+    - not chkconfig | bool
     - result.stat.exists
     - result.stat.isdir
     - result.failed is false
@@ -36,13 +42,13 @@
     state: present
     disable_gpg_check: yes
   when:
-    - chkconfig is not defined
+    - not chkconfig | bool
 
 - name: "Move existing /etc/init.d entries back from temp"
   ansible.builtin.shell:
     cmd: mv /tmp/init.d.bk/* /etc/init.d/
   when:
-    - chkconfig is not defined
+    - not chkconfig | bool
 
 - name: "Register Flexera Services"
   ansible.builtin.shell:
@@ -52,7 +58,7 @@
     - ndtask
     - fnms-docker-monitor
   when:
-    - chkconfig is not defined
+    - not chkconfig | bool
 
 - name: "Start ndtask and mgsusageag services"
   ansible.builtin.service:
@@ -63,4 +69,4 @@
     - ndtask
     - fnms-docker-monitor
   when:
-      - chkconfig is not defined
+      - not chkconfig | bool
