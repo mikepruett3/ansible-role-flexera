@@ -39,3 +39,8 @@
   when:
     - ansible_facts['os_family'] == "RedHat"
     - ansible_facts['distribution_major_version'] >= '9'
+
+- name: "Include tasks from config playbook"
+  ansible.builtin.include_tasks: config.yaml
+  when:
+    - config_file is defined
