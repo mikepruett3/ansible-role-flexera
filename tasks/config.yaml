@@ -15,6 +15,12 @@
     regexp: '(?i)^(CheckServerCertificate.*)'
     line: "CheckServerCertificate=false"
 
+- name: "Disable CheckCertificateRevocation setting in /var/opt/managesoft/etc/config.ini"
+  ansible.builtin.lineinfile:
+    path: /var/opt/managesoft/etc/config.ini
+    regexp: '(?i)^(CheckCertificateRevocation.*)'
+    line: "CheckCertificateRevocation=false"
+
 - name: "Start ndtask and mgsusageag services"
   ansible.builtin.systemd:
     state: started
